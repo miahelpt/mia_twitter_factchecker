@@ -1,4 +1,4 @@
-# twitterlistener
-Code for the MIA automated twitter listener & fact checker.
+## MIA Twitter Factchecker
+This repository contains the source code for the MIA Twitter Factchecker. 
 
-TODO: add fancy images etc. Explain how to set this up!
+The factchecker has been created by Stichting MIA Helpt (https://www.miahelpt.nl), with financial support from the SIDN Fund (https://www.sidnfonds.nl)
