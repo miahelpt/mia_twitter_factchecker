@@ -21,7 +21,7 @@ class GoogleFactCheckLoader(FactCheckLoader):
         print(self.dayssince)  
         config = ConfigParser()
         config.read('config.ini')
-        self.dev_key = config.get('google', 'developerkey')
+        self.dev_key = config['google']['developerkey']
 
 
 
@@ -37,7 +37,7 @@ class GoogleFactCheckLoader(FactCheckLoader):
         
 
     def runQuery(self, query): 
-        with build('factchecktools', 'v1alpha1', developerKey='') as service:
+        with build('factchecktools', 'v1alpha1', developerKey=self.dev_key) as service:
            # response =.execute()
 
             if self.dayssince is not None:
@@ -104,10 +104,12 @@ class GoogleFactCheckLoader(FactCheckLoader):
                 idPublisher = super().store_or_retrieve_publisher(publisher.get("name",""), publisher.get("site", ""))
 
                 #step 3 store the review
-                idFactCheck = super().store_or_retrieve_factcheck(idClaim, idPublisher, review.get("url", ""), review.get("title", ""), review.get("reviewDate",""), review.get("textualRating", ""), review.get("languageCode",""), fullreview=fulltext)
+                idFactCheck, _new = super().store_or_retrieve_factcheck(idClaim, idPublisher, review.get("url", ""), review.get("title", ""), review.get("reviewDate",""), review.get("textualRating", ""), review.get("languageCode",""), fullreview=fulltext)
 
-                #step 4 store the paragraphs
-                for paragraph in paragraphs:
-                    #this will be used for paragraph based retrieval
-                    super().store_or_retrieve_paragraph(idClaim, idFactCheck, paragraph)
+                if _new:
+                    #step 4 store the paragraphs
+                    for paragraph in paragraphs:
+                        #this will be used for paragraph based retrieval
+                        if paragraph.strip() != "":
+                            super().store_or_retrieve_paragraph(idClaim, idFactCheck, paragraph)
               

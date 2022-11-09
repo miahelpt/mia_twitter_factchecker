@@ -76,7 +76,9 @@ class FactCheckLoader:
             """
 
         review = self.db.retrieve_one(strQuery)
+
         if review is None:
+            #this did not exist yet.
             fullreview = fullreview.replace("\"", "'")
             strQuery = f"""
                 insert into factcheck(`url`, `title`, `reviewDate`, `rating`, `languagecode`, `idClaim`, `idPublisher`, `fullreview`) 
@@ -86,9 +88,9 @@ class FactCheckLoader:
 
 
             review_id = self.db.insert(strQuery)
-            return review_id
+            return review_id, True
         else:
-            return review["idfactcheck"]
+            return review["idfactcheck"], False
 
 
     def store_or_retrieve_paragraph(self, idClaim, idFactcheck, paragraph):
