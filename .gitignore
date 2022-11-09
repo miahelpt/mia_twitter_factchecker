@@ -1,0 +1,8 @@
+node_modules
+config.ini
+twitterlistener.db
+models/
+datasets/
+*.pyc
+*.bin
+*.csv

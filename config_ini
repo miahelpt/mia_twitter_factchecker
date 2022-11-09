@@ -1,0 +1,10 @@
+[tweepy]
+consumer_key= 
+consumer_secret= 
+access_token= 
+access_token_secret= 
+
+[database]
+secret_manager = 
+local_name = twitterlistener.db
+tunnel = 1
