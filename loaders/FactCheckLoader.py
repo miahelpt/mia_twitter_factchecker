@@ -5,18 +5,13 @@
 Interface class for factcheck loading
 """
 import helpers.SecretManager
-from helpers.Database import LocalDBConnection, MySQLDbConnection
+from helpers.Database import get_database
 #import pymysql.cursors
 import json
 
 class FactCheckLoader:
     def __init__(self, local_db=True):
-        if local_db:
-            print("opening local db connection")
-            self.db = LocalDBConnection("factcheckloader")
-        else:
-            self.db = MySQLDbConnection("factcheckloader")    
-
+        self.db=get_database("factcheckloader")
         self.last_run, self.dayssince = self.db.getLastRun()  
 
     def store_or_retrieve_claim(self, text, claimant, claimdate):

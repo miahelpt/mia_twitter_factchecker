@@ -7,27 +7,14 @@ from helpers import Database, SecretManager
 import json
 import numpy as np
 import spacy_universal_sentence_encoder
-
+from helpers.Database import get_database
 
 
 
 ### Embedder is the superclass from which the different embeddings inherit.
 class Embedder():
     def __init__(self): 
-        ## TODO fix
-        print(f"starting {self.name}")
-        #setting up database connection
-        print("checking lastrun datetime")
-        db_creds = SecretManager.get_secret("rds-db-credentials/cluster-NIC6C7FIOXB6P5VQHFO52NVNPA/admin")
-        print(db_creds)
-        db_creds=json.loads(db_creds)
-                # Connect to the database
-
-        if True:
-            db_creds["host"] = "localhost"
-            db_creds["port"] = 3301
-
-        self.db = Database.Database(db_creds, self.name)
+        self.db=get_database(self.name)
         self.last_run, self.dayssince = self.db.getLastRun()
 
 class LaserEmbeddings(Embedder):

@@ -118,6 +118,13 @@ class Database():
             cursor.execute(query)
             return cursor.lastrowid
 
+    def execute(self,query):
+        with self.get_connection() as cursor:
+            # Read a single record
+            #sql = "SELECT * FROM `management` WHERE `loader_name`=%s"
+            cursor.execute(query)
+            return True
+
     def storePandasDataframe(self, dataframe):
         print(dataframe)
         pdDf = pd.DataFrame(dataframe)
@@ -135,6 +142,60 @@ class MySQLDbConnection(Database):
         self.caller_name = name
         self.last_run, self.dayssince = self.getLastRun()
 
+        ###todo: setup tables for clean install
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS facts(idfact INTEGER PRIMARY KEY AUTOINCREMENT, tweet_id int, fact text, rating varchar(3), confidence float);
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS tweet_topics(idtweettopic INTEGER PRIMARY KEY AUTOINCREMENT,  tweet_id int not null, topic varchar(12) not null, confidence float);
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS tweets(tweet_id int not null primary key, twitter_text text, relevant varchar(3), confidence real, sentiment varchar(10), sentiment_confidence real, retweet_count int, created_at datetime);
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS hashtags(hashtag varchar(20) not null primary key, relevant int, irrelevant int);
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS management(loader_name varchar(20), lastrun datetime );
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS `claim` (
+            `idclaim` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `text` mediumtext,
+            `claimant` varchar(45) DEFAULT NULL,
+            `claimdate` datetime DEFAULT NULL
+            );
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS `publisher` (
+            `idpublisher` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `name` varchar(45),
+            `site` varchar(45)
+            );
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS `factcheck` (
+            `idfactcheck` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `url` varchar(255) DEFAULT NULL,
+            `title` text,
+            `reviewDate` datetime DEFAULT NULL,
+            `rating` varchar(45) DEFAULT NULL,
+            `languagecode` varchar(45) DEFAULT NULL,
+            `fullreview` longtext,
+            `idClaim` int(11) DEFAULT NULL,
+            `idPublisher` int(11) DEFAULT NULL
+            );
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS `paragraph` (
+            `idparagraph` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `idClaim` int(11) DEFAULT NULL,
+            `idFactcheck` int(11) DEFAULT NULL,
+            `paragraph` mediumtext
+            );      
+        """)
+        ###todo: setup tables for clean install
+
 class LocalDBConnection(Database):
     def __init__(self, name):
         print("initializing local db")
@@ -142,7 +203,71 @@ class LocalDBConnection(Database):
         super().__init__(local=True)
         self.caller_name = name
 
+        ###todo: setup tables for clean install
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS facts(idfact INTEGER PRIMARY KEY AUTOINCREMENT, tweet_id int, fact text, rating varchar(3), confidence float);
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS tweet_topics(idtweettopic INTEGER PRIMARY KEY AUTOINCREMENT,  tweet_id int not null, topic varchar(12) not null, confidence float);
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS tweets(tweet_id int not null primary key, twitter_text text, relevant varchar(3), confidence real, sentiment varchar(10), sentiment_confidence real, retweet_count int, created_at datetime);
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS hashtags(hashtag varchar(20) not null primary key, relevant int, irrelevant int);
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS management(loader_name varchar(20), lastrun datetime );
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS `claim` (
+            `idclaim` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `text` mediumtext,
+            `claimant` varchar(45) DEFAULT NULL,
+            `claimdate` datetime DEFAULT NULL
+            );
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS `publisher` (
+            `idpublisher` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `name` varchar(45),
+            `site` varchar(45)
+            );
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS `factcheck` (
+            `idfactcheck` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `url` varchar(255) DEFAULT NULL,
+            `title` text,
+            `reviewDate` datetime DEFAULT NULL,
+            `rating` varchar(45) DEFAULT NULL,
+            `languagecode` varchar(45) DEFAULT NULL,
+            `fullreview` longtext,
+            `idClaim` int(11) DEFAULT NULL,
+            `idPublisher` int(11) DEFAULT NULL
+            );
+        """)
+        super().execute("""
+            CREATE TABLE IF NOT EXISTS `paragraph` (
+            `idparagraph` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `idClaim` int(11) DEFAULT NULL,
+            `idFactcheck` int(11) DEFAULT NULL,
+            `paragraph` mediumtext
+            );      
+        """)
 
-    """
+
+
+
+def get_database(name):
+    config = ConfigParser()
+    config.read('config.ini')
+    if config["database"]["use_local"] == "1":
+        return LocalDBConnection(name)
+    else:
+        return MySQLDbConnection(name)
+
+
+    """    
         create table facts(tweet_id int, fact text, rating varchar(3), confidence float);
     """

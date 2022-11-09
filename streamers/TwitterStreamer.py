@@ -5,8 +5,7 @@ import tweepy as tw
 import json
 from classifiers.tweet_classifier import MiaTweetClassifier
 from classifiers.factranker import MiaFactRanker
-import sqlite3
-
+from helpers.Database import get_database
 
 class TwitterListener(tw.Stream):
     def __init__(self, num_tweets_to_grab=-1):
@@ -35,13 +34,12 @@ class TwitterListener(tw.Stream):
         self.factranker = MiaFactRanker()
         self.factranker.load_model("factranker")
 
-        self.con =  sqlite3.connect("twitterlistener.db")
-        self.cursor = self.con.cursor()
+        self.db=get_database("streamer")
+
 
     def get_hashtags(self): 
         s_query = "select hashtag from hashtags where relevant<>0 order by relevant desc, irrelevant asc limit 15;"
-        self.cursor.execute(s_query)
-        hashtags = [f"#{h[0]}" for h in self.cursor.fetchall()]
+        hashtags = [f"#{h[0]}" for h in self.db.retrieve_all(s_query)]
         if(len(hashtags) == 0): 
             hashtags = ["#covid", "#corona", "#vaccin", "#vaccinatieschade"]
         return hashtags
@@ -87,7 +85,7 @@ class TwitterListener(tw.Stream):
                     ({tweet_id}, "{text}", '{relevant}',{confidence}, "{sentiment}", {sconfidence},{retweets}, '{created_at}')
                     ON CONFLICT(tweet_id) DO UPDATE SET retweet_count = {retweets};
                 """
-            self.cursor.execute(
+            self.db.insert(
                 s_query
             )
 
@@ -100,7 +98,7 @@ class TwitterListener(tw.Stream):
                         INSERT INTO facts VALUES
                         ({tweet_id}, "{fact[0]}", "{fact[1]}", {fact[2]});
                     """
-                    self.cursor.execute(
+                    self.db.insert(
                         s_query
                     )
 
@@ -109,7 +107,7 @@ class TwitterListener(tw.Stream):
                         INSERT INTO tweet_topics VALUES
                         ({tweet_id}, "{topic[0]}",{topic[1]});
                     """
-                    self.cursor.execute(
+                    self.db.insert(
                         s_query
                     )
                 
@@ -119,7 +117,7 @@ class TwitterListener(tw.Stream):
                         ("{hashtag["text"]}", 1, 0)
                         ON CONFLICT(hashtag) DO UPDATE SET relevant = relevant+1;
                     """
-                    self.cursor.execute(
+                    self.db.insert(
                         s_query
                     )
                     
@@ -130,11 +128,11 @@ class TwitterListener(tw.Stream):
                         ("{hashtag["text"]}", 0, 1)
                         ON CONFLICT(hashtag) DO UPDATE SET irrelevant = irrelevant+1;
                     """
-                    self.cursor.execute(
+                    self.db.insert(
                         s_query
                     )
 
-            self.con.commit()
+            #self.con.commit()
 
         except Exception as e:
             print(e)

@@ -11,6 +11,8 @@ import re
 from sentence_transformers.cross_encoder import CrossEncoder
 from classifiers.factranker import MiaFactRanker #see: https://github.com/lejafar/FactRank
 import spacy
+from configparser import ConfigParser
+
 
 class MiaFactChecker():
     def __init__(self):
@@ -20,7 +22,7 @@ class MiaFactChecker():
         self.crossEnc = CrossEncoder('./models/cross_encoder')
         self.factranker = MiaFactRanker()
         self.factranker.load_model("factranker")
-        self.db = Database.MySQLDbConnection("embedder") #ensure we have all.
+        self.db = Database.get_database("embedder") #ensure we have all.
         self.claims = self.db.retrieve_all(query="select idClaim as id, text from claims.claim")
         self.factchecks = self.db.retrieve_all(query="select distinct idClaim as id, url from claims.factcheck")
         self.embed = lookup.embedding.SBertEmbeddings()

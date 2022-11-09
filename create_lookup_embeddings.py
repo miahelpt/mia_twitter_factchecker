@@ -8,9 +8,8 @@ import json
 import numpy as np
 import pandas as pd
 
-#### this should run either from cloud or local db.
 
-db = Database.MySQLDbConnection("embedder")
+db = Database.get_database("embedder")
 
 #claims = db.retrieve_all(query="select idClaim as id, text from claims.claim")
 #tweets = db.retrieve_all(query="SELECT tweet_id FROM tweets.tweet_has_annotation where relevant=1;")
