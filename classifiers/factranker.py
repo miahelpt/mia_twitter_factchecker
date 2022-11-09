@@ -16,11 +16,11 @@ from helpers.Twitter import TwitterParser
 
 class MiaFactRanker():
     def __init__(self):
-        self.df_sentences = pd.read_csv("datasets/factrank_combined.csv")
         #self.spacy_nlp = spacy.load('nl_core_news_lg')
         self.twitterParser = TwitterParser()
 
     def train_factrank(self):
+        self.df_sentences = pd.read_csv("datasets/factrank_combined.csv")
         self.df_sentences.rename(
             columns={
                 "statement": "text",

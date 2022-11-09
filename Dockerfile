@@ -113,13 +113,14 @@ RUN set -eux; \
 	\
 	pip --version
 
-ADD ./* /miaapp/
-ADD ./classifiers /miaapp/classifiers
-ADD ./factcheck /miaapp/factcheck
-ADD ./helpers /miaapp/helpers
-ADD ./loaders /miaapp/loaders
-ADD ./lookup /miaapp/lookup
-ADD ./streamers /miaapp/streamers
+COPY ./* /miaapp/
+COPY ./classifiers/ /miaapp/classifiers/
+COPY ./factcheck/ /miaapp/factcheck/
+COPY ./helpers/ /miaapp/helpers/
+COPY ./loaders/ /miaapp/loaders/
+COPY ./lookup/ /miaapp/lookup/
+COPY ./streamers/ /miaapp/streamers/
+COPY ./models /miaapp/models/
 
 
 RUN pip install -r /miaapp/requirements.txt
