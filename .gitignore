@@ -1,10 +1,10 @@
 node_modules
 config.ini
 twitterlistener.db
-models/
 !models/download.sh
-datasets/
+models/
 !datasets/download.sh
+datasets/
 
 *.pyc
 *.bin
