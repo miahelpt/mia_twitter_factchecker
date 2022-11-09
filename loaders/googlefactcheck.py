@@ -11,6 +11,7 @@ from googleapiclient.discovery import build
 import time
 from datetime import date
 from newspaper import Article
+from configparser import ConfigParser
 
 class GoogleFactCheckLoader(FactCheckLoader):
     def __init__(self):
@@ -18,6 +19,11 @@ class GoogleFactCheckLoader(FactCheckLoader):
         super().__init__()
         print(self.last_run)  
         print(self.dayssince)  
+        config = ConfigParser()
+        config.read('config.ini')
+        self.dev_key = config.get('google', 'developerkey')
+
+
 
     #TODO: this should be dynamic, based on a db of queries, like the hashtags of the tweets.
     def loadFactChecks(self):
@@ -31,7 +37,7 @@ class GoogleFactCheckLoader(FactCheckLoader):
         
 
     def runQuery(self, query): 
-        with build('factchecktools', 'v1alpha1', developerKey='AIzaSyCtD5p13xtAc5lpPYJ89dNVgP1xi2DOrqA') as service:
+        with build('factchecktools', 'v1alpha1', developerKey='') as service:
            # response =.execute()
 
             if self.dayssince is not None:

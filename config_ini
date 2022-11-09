@@ -8,3 +8,6 @@ access_token_secret=
 secret_manager = 
 local_name = twitterlistener.db
 tunnel = 1
+
+[google]
+developerkey = 
