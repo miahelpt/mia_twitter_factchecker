@@ -80,11 +80,20 @@ class TwitterListener(tw.Stream):
             sentiment, sconfidence = self.sentiment_classifier.predict(text)
 
             text = text.replace("\"", "'")
-            s_query =  f"""
+
+            if self.db.local:
+                s_query =  f"""
                     INSERT INTO tweets VALUES
                     ({tweet_id}, "{text}", '{relevant}',{confidence}, "{sentiment}", {sconfidence},{retweets}, '{created_at}')
                     ON CONFLICT(tweet_id) DO UPDATE SET retweet_count = {retweets};
                 """
+            else: 
+                s_query =  f"""
+                    INSERT INTO tweets VALUES
+                    ({tweet_id}, "{text}", '{relevant}',{confidence}, "{sentiment}", {sconfidence},{retweets}, '{created_at}')
+                    ON DUPLICATE KEY UPDATE retweet_count = {retweets};
+                """
+
             self.db.insert(
                 s_query
             )
@@ -112,22 +121,36 @@ class TwitterListener(tw.Stream):
                     )
                 
                 for hashtag in hashtags:
-                    s_query =  f"""
-                        INSERT INTO hashtags VALUES
-                        ("{hashtag["text"]}", 1, 0)
-                        ON CONFLICT(hashtag) DO UPDATE SET relevant = relevant+1;
-                    """
+                    if self.db.local:
+                        s_query =  f"""
+                            INSERT INTO hashtags VALUES
+                            ("{hashtag["text"]}", 1, 0)
+                            ON CONFLICT(hashtag) DO UPDATE SET relevant = relevant+1;
+                        """
+                    else: 
+                        s_query =  f"""
+                            INSERT INTO hashtags VALUES
+                            ("{hashtag["text"]}", 1, 0)
+                            ON DUPLICATE KEY UPDATE relevant = relevant+1;
+                        """
                     self.db.insert(
                         s_query
                     )
                     
             else:
                 for hashtag in hashtags:
-                    s_query =  f"""
-                        INSERT INTO hashtags VALUES
-                        ("{hashtag["text"]}", 0, 1)
-                        ON CONFLICT(hashtag) DO UPDATE SET irrelevant = irrelevant+1;
-                    """
+                    if self.db.local:
+                        s_query =  f"""
+                            INSERT INTO hashtags VALUES
+                            ("{hashtag["text"]}", 0, 1)
+                            ON CONFLICT(hashtag) DO UPDATE SET irrelevant = irrelevant+1;
+                        """
+                    else: 
+                        s_query =  f"""
+                            INSERT INTO hashtags VALUES
+                            ("{hashtag["text"]}", 0, 1)
+                            ON DUPLICATE KEY UPDATE irrelevant = irrelevant+1;
+                        """
                     self.db.insert(
                         s_query
                     )

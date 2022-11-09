@@ -134,6 +134,7 @@ class Database():
 
 class MySQLDbConnection(Database):
     def __init__(self, name):
+        print("connecting to MySQL")
         self.name=name
         print(f"starting {self.name}")
         #setting up database connection
@@ -144,10 +145,10 @@ class MySQLDbConnection(Database):
 
         ###todo: setup tables for clean install
         super().execute("""
-            CREATE TABLE IF NOT EXISTS facts(idfact INTEGER PRIMARY KEY AUTOINCREMENT, tweet_id int, fact text, rating varchar(3), confidence float);
+            CREATE TABLE IF NOT EXISTS facts(idfact INTEGER PRIMARY KEY AUTO_INCREMENT, tweet_id int, fact text, rating varchar(3), confidence float);
         """)
         super().execute("""
-            CREATE TABLE IF NOT EXISTS tweet_topics(idtweettopic INTEGER PRIMARY KEY AUTOINCREMENT,  tweet_id int not null, topic varchar(12) not null, confidence float);
+            CREATE TABLE IF NOT EXISTS tweet_topics(idtweettopic INTEGER PRIMARY KEY AUTO_INCREMENT,  tweet_id int not null, topic varchar(12) not null, confidence float);
         """)
         super().execute("""
             CREATE TABLE IF NOT EXISTS tweets(tweet_id int not null primary key, twitter_text text, relevant varchar(3), confidence real, sentiment varchar(10), sentiment_confidence real, retweet_count int, created_at datetime);
@@ -160,7 +161,7 @@ class MySQLDbConnection(Database):
         """)
         super().execute("""
             CREATE TABLE IF NOT EXISTS `claim` (
-            `idclaim` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `idclaim` INTEGER PRIMARY KEY AUTO_INCREMENT,
             `text` mediumtext,
             `claimant` varchar(45) DEFAULT NULL,
             `claimdate` datetime DEFAULT NULL
@@ -168,14 +169,14 @@ class MySQLDbConnection(Database):
         """)
         super().execute("""
             CREATE TABLE IF NOT EXISTS `publisher` (
-            `idpublisher` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `idpublisher` INTEGER PRIMARY KEY AUTO_INCREMENT,
             `name` varchar(45),
             `site` varchar(45)
             );
         """)
         super().execute("""
             CREATE TABLE IF NOT EXISTS `factcheck` (
-            `idfactcheck` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `idfactcheck` INTEGER PRIMARY KEY AUTO_INCREMENT,
             `url` varchar(255) DEFAULT NULL,
             `title` text,
             `reviewDate` datetime DEFAULT NULL,
@@ -188,7 +189,7 @@ class MySQLDbConnection(Database):
         """)
         super().execute("""
             CREATE TABLE IF NOT EXISTS `paragraph` (
-            `idparagraph` INTEGER PRIMARY KEY AUTOINCREMENT,
+            `idparagraph` INTEGER PRIMARY KEY AUTO_INCREMENT,
             `idClaim` int(11) DEFAULT NULL,
             `idFactcheck` int(11) DEFAULT NULL,
             `paragraph` mediumtext
