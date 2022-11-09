@@ -3,7 +3,6 @@ from laserembeddings import Laser
 import fasttext
 import faiss                   # make faiss available
 from sentence_transformers import SentenceTransformer
-from helpers import Database, SecretManager
 import json
 import numpy as np
 import spacy_universal_sentence_encoder

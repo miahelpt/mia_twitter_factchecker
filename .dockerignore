@@ -1,11 +1,12 @@
 node_modules
-config.ini
 twitterlistener.db
-models/*
+models
 !models/download.sh
 
 datasets/*
 !datasets/download.sh
+
+app
 
 testvenv
 
