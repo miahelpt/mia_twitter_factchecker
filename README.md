@@ -16,9 +16,13 @@ Running the code depends on:
 1. Rename config_ini to config.ini and fill the required api keys (twitter / google)
 2. If using a local database, set use_local to 1, this will create a SQLite database in the main directory; if using AWS, fill the secret manager secret (and if using a tunnel, set tunnel to 1, this will assume a tunnel to the database at localhost:3001)
 3. Install the requirements (pip install -r requirements.txt)
+4. Download the spacy dutch tokenizer:
+    python -m spacy download nl_core_news_sm
 4. Download the models:
     ./models/download.sh
 
 ### Filling the database and start matching facts.
+1. Sync the Google factchecks:
+    python load_factchecks.py
 
 
