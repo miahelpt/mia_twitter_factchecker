@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 
 from re import S
+from numpy import s_
 import tweepy as tw
 import json
 from classifiers.tweet_classifier import MiaTweetClassifier
@@ -93,6 +94,7 @@ class TwitterListener(tw.Stream):
                     ({tweet_id}, "{text}", '{relevant}',{confidence}, "{sentiment}", {sconfidence},{retweets}, '{created_at}')
                     ON DUPLICATE KEY UPDATE retweet_count = {retweets};
                 """
+                print(s_query)
 
             self.db.insert(
                 s_query
@@ -111,9 +113,13 @@ class TwitterListener(tw.Stream):
                         s_query
                     )
 
+        
                 for topic in topics:
                     s_query =  f"""
-                        INSERT INTO tweet_topics VALUES
+                        INSERT INTO tweet_topics(
+                        `tweet_id`,
+                        `topic`,
+                        `confidence`) VALUES
                         ({tweet_id}, "{topic[0]}",{topic[1]});
                     """
                     self.db.insert(

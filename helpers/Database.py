@@ -141,26 +141,29 @@ class MySQLDbConnection(Database):
         print("checking lastrun datetime")
         super().__init__(local=False)
         self.caller_name = name
-        self.last_run, self.dayssince = self.getLastRun()
+
+        super().execute("""
+            CREATE SCHEMA IF NOT EXISTS `claims` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ;
+        """)
 
         ###todo: setup tables for clean install
         super().execute("""
-            CREATE TABLE IF NOT EXISTS facts(idfact INTEGER PRIMARY KEY AUTO_INCREMENT, tweet_id int, fact text, rating varchar(3), confidence float);
+            CREATE TABLE IF NOT EXISTS claims.facts(idfact INTEGER PRIMARY KEY AUTO_INCREMENT, tweet_id BIGINT, fact text, rating varchar(3), confidence float);
         """)
         super().execute("""
-            CREATE TABLE IF NOT EXISTS tweet_topics(idtweettopic INTEGER PRIMARY KEY AUTO_INCREMENT,  tweet_id int not null, topic varchar(12) not null, confidence float);
+            CREATE TABLE IF NOT EXISTS claims.tweet_topics(idtweettopic INTEGER PRIMARY KEY AUTO_INCREMENT,  tweet_id BIGINT not null, topic varchar(12) not null, confidence float);
         """)
         super().execute("""
-            CREATE TABLE IF NOT EXISTS tweets(tweet_id int not null primary key, twitter_text text, relevant varchar(3), confidence real, sentiment varchar(10), sentiment_confidence real, retweet_count int, created_at datetime);
+            CREATE TABLE IF NOT EXISTS claims.tweets(tweet_id BIGINT not null primary key, twitter_text text, relevant varchar(3), confidence real, sentiment varchar(10), sentiment_confidence real, retweet_count int, created_at datetime);
         """)
         super().execute("""
-            CREATE TABLE IF NOT EXISTS hashtags(hashtag varchar(20) not null primary key, relevant int, irrelevant int);
+            CREATE TABLE IF NOT EXISTS claims.hashtags(hashtag varchar(20) not null primary key, relevant int, irrelevant int);
         """)
         super().execute("""
-            CREATE TABLE IF NOT EXISTS management(loader_name varchar(20), lastrun datetime );
+            CREATE TABLE IF NOT EXISTS claims.management(loader_name varchar(20), lastrun datetime );
         """)
         super().execute("""
-            CREATE TABLE IF NOT EXISTS `claim` (
+            CREATE TABLE IF NOT EXISTS claims.`claim` (
             `idclaim` INTEGER PRIMARY KEY AUTO_INCREMENT,
             `text` mediumtext,
             `claimant` varchar(45) DEFAULT NULL,
@@ -168,14 +171,14 @@ class MySQLDbConnection(Database):
             );
         """)
         super().execute("""
-            CREATE TABLE IF NOT EXISTS `publisher` (
+            CREATE TABLE IF NOT EXISTS claims.`publisher` (
             `idpublisher` INTEGER PRIMARY KEY AUTO_INCREMENT,
             `name` varchar(45),
             `site` varchar(45)
             );
         """)
         super().execute("""
-            CREATE TABLE IF NOT EXISTS `factcheck` (
+            CREATE TABLE IF NOT EXISTS claims.`factcheck` (
             `idfactcheck` INTEGER PRIMARY KEY AUTO_INCREMENT,
             `url` varchar(255) DEFAULT NULL,
             `title` text,
@@ -188,13 +191,16 @@ class MySQLDbConnection(Database):
             );
         """)
         super().execute("""
-            CREATE TABLE IF NOT EXISTS `paragraph` (
+            CREATE TABLE IF NOT EXISTS claims.`paragraph` (
             `idparagraph` INTEGER PRIMARY KEY AUTO_INCREMENT,
             `idClaim` int(11) DEFAULT NULL,
             `idFactcheck` int(11) DEFAULT NULL,
             `paragraph` mediumtext
             );      
         """)
+
+        self.last_run, self.dayssince = self.getLastRun()
+
         ###todo: setup tables for clean install
 
 class LocalDBConnection(Database):
@@ -256,6 +262,7 @@ class LocalDBConnection(Database):
             `paragraph` mediumtext
             );      
         """)
+        self.last_run, self.dayssince = self.getLastRun()
 
 
 
