@@ -42,7 +42,7 @@ class MiaFactChecker():
     def extract_simil(self, _json):
         return _json["similarity"]
 
-    def factcheck_tweet(self, tweet):
+    def factcheck_tweet(self, tweet, match_to="claim"):
         fr_sentences = self.factranker.extract_from_tweet(tweet)
         factchecks = []
         if(len(fr_sentences)> 0):
@@ -69,7 +69,12 @@ class MiaFactChecker():
                             else: 
                                 #paragraph
                                 related_factchecks = self.factcheck_lookup[self.factcheck_lookup.idFactcheck==matched_claim.idFactcheck.values[0]]
-                                claim_text = matched_claim.text.values[0] ##match back to the title?
+                                if(match_to=="claim"):
+                                    claim_text = related_factchecks.claim.values[0]  
+                                elif match_to=="title":   
+                                    claim_text = related_factchecks.title.values[0]  
+                                else:
+                                    matched_claim.text.values[0] ##match back to the title?
 
                             claim_text = claim_text.as_py() #convert StringScalar to python str
                             simil = self.crossEnc.predict([fr_to_check, claim_text])

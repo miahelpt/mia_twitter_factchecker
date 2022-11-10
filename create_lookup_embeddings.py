@@ -11,28 +11,13 @@ import vaex as vx
 
 db = Database.get_database("embedder")
 
-#claims = db.retrieve_all(query="select idClaim as id, text from claims.claim")
-#tweets = db.retrieve_all(query="SELECT tweet_id FROM tweets.tweet_has_annotation where relevant=1;")
 claims = db.retrieve_all(query="select distinct idClaim as id, -1 as idFactcheck, '' as url, text, 'claim' as type from claim")
 paragraphs = db.retrieve_all(query="select distinct p.idClaim as id, p.idFactcheck, f.url, p.paragraph as text, 'paragraph' as type from paragraph p inner join factcheck f on f.idfactcheck=p.idfactcheck")
-factchecks = db.retrieve_all(query="select idFactcheck, idClaim, url, title from factcheck")
-#claims_sentences = [d['text'] for d in claims]
-#claims_ids = [d['id'] for d in claims]
+factchecks = db.retrieve_all(query="select fc.idFactcheck, fc.idClaim, fc.url, fc.title, c.text as claim from factcheck fc inner join claim c on  fc.idClaim=c.idClaim")
 
-#sentences = [d['text'] for d in paragraphs]
-#ids = [ d['id'] for d in paragraphs]
+##Factchecks allows us to match back to the title and the claim as reported to google for matching.
 
-#paragraphs = list(filter(lambda x: len(x.split()) > 2, paragraphs))
-#print(len(sentences))
-#sentences = list(filter(lambda x: len(x.split()) > 2, sentences)) #remove very short sentences / headers
-#print(len(sentences))
 
-#combined = [*claims_sentences, *sentences]
-#combined_ids = [*claims_ids, *ids]  ## note: might contain duplicate ids!
-
-#ids = np.array(ids)
-#claims_ids = np.array(claims_ids)
-#combined_ids = np.array(combined_ids)
 df_factcheck = pd.DataFrame(factchecks)
 df_claims = pd.DataFrame(claims)
 df_paragraphs = pd.DataFrame(paragraphs)

@@ -2,7 +2,7 @@
 from factcheck.factchecker import MiaFactChecker
 #import vaex as vx 
 
-factchecker = MiaFactChecker( type ="combined", embed="mpnet")
+factchecker = MiaFactChecker( type ="combined", embed="mpnet", match_to="claim")
 print(factchecker.factcheck_tweet(    """
 Dus niet #corona maar het #coronavaccin verantwoordelijk voor #myocarditis en #pericarditis. #vaccinatieschade 👇"""))
 
