@@ -15,7 +15,7 @@ from configparser import ConfigParser
 import vaex as vx
 
 class MiaFactChecker():
-    def __init__(self, type="combined", embed="mpnet"):
+    def __init__(self, type="combined", embed="mpnet", match_to="claim"):
         ###TODO: currently we only check the candidates back to the claim, allow for check on title and individual paragraph (matched) as well.
         print("setting up class to factcheck!")
         self.nlp = spacy.load('nl_core_news_md')
@@ -27,7 +27,7 @@ class MiaFactChecker():
         #self.factchecks = self.db.retrieve_all(query="select distinct idClaim as id, url from claims.factcheck")
         self.lookup_table = vx.open(f"./models/lookup_{type}.hdf5")
         self.factcheck_lookup = vx.open(f"./models/lookup_factcheck.hdf5")
-
+        self.match_to = match_to
         if embed == "mpnet":
             self.embed = lookup.embedding.SBertEmbeddings() 
         elif embed == "laser":
@@ -42,7 +42,7 @@ class MiaFactChecker():
     def extract_simil(self, _json):
         return _json["similarity"]
 
-    def factcheck_tweet(self, tweet, match_to="claim"):
+    def factcheck_tweet(self, tweet):
         fr_sentences = self.factranker.extract_from_tweet(tweet)
         factchecks = []
         if(len(fr_sentences)> 0):
@@ -69,9 +69,9 @@ class MiaFactChecker():
                             else: 
                                 #paragraph
                                 related_factchecks = self.factcheck_lookup[self.factcheck_lookup.idFactcheck==matched_claim.idFactcheck.values[0]]
-                                if(match_to=="claim"):
+                                if(self.match_to=="claim"):
                                     claim_text = related_factchecks.claim.values[0]  
-                                elif match_to=="title":   
+                                elif self.match_to=="title":   
                                     claim_text = related_factchecks.title.values[0]  
                                 else:
                                     matched_claim.text.values[0] ##match back to the title?
