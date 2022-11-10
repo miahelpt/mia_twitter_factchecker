@@ -27,7 +27,7 @@ class MiaFactChecker():
         #self.factchecks = self.db.retrieve_all(query="select distinct idClaim as id, url from claims.factcheck")
         self.lookup_table = vx.open(f"./models/lookup_{type}.hdf5")
         self.factcheck_lookup = vx.open(f"./models/lookup_factcheck.hdf5")
-        
+
         if embed == "mpnet":
             self.embed = lookup.embedding.SBertEmbeddings() 
         elif embed == "laser":
@@ -61,21 +61,30 @@ class MiaFactChecker():
                 try:
                     for i in I:
                         for c in i:
-                            matched_claim = self.lookup_table["index"== c]
-                            claim_id = matched_claim["claimId"].item()
-                            claim_text = matched_claim["text"].item()
+                            matched_claim = self.lookup_table[self.lookup_table.index== c]
+                            claim_type = matched_claim.type.values[0].as_py()
+                            if claim_type == "claim":
+                                related_factchecks = self.factcheck_lookup[self.factcheck_lookup.idClaim==matched_claim.id.values[0]]
+                                claim_text = matched_claim.text.values[0]
+                            else: 
+                                #paragraph
+                                related_factchecks = self.factcheck_lookup[self.factcheck_lookup.idFactcheck==matched_claim.idFactcheck.values[0]]
+                                claim_text = matched_claim.text.values[0] ##match back to the title?
 
+                            claim_text = claim_text.as_py() #convert StringScalar to python str
                             simil = self.crossEnc.predict([fr_to_check, claim_text])
 
-                            if  simil>0.3: #d[it][itr]>=0.5:
-                                related_factchecks = self.factcheck_lookup["claimid"== claim_id] #dfFactchecks.loc[dfFactchecks['id'] == c]
-                                print(related_factchecks)
 
+                            if  simil>0.3: #d[it][itr]>=0.5:
+                                 #dfFactchecks.loc[dfFactchecks['id'] == c]
+                               
+                                urls = [val.as_py() for val in related_factchecks.url.values]
                                 df_factcheck.append({
                                         "similarity": simil,
-                                        "urls": related_factchecks["url"].tolist(),
+                                        "urls": urls,
+                                        "type": claim_type,
                                         "tweet_text": fr_to_check,
-                                        "matched_claim_id": claim_id,
+                                        "matched_claim_id": c, #todo: this is the lookup index, we need to fix this
                                         "matched_claim_text": claim_text,
                                         "distance": d[it][itr],
                                         "embedding": self.embed.name,
