@@ -65,6 +65,7 @@ class MiaFactChecker():
                             claim_type = matched_claim.type.values[0].as_py()
                             if claim_type == "claim":
                                 related_factchecks = self.factcheck_lookup[self.factcheck_lookup.idClaim==matched_claim.id.values[0]]
+                                self.claim_id=matched_claim.id.values[0]
                                 claim_text = matched_claim.text.values[0]
                             else: 
                                 #paragraph
@@ -75,6 +76,8 @@ class MiaFactChecker():
                                     claim_text = related_factchecks.title.values[0]  
                                 else:
                                     matched_claim.text.values[0] ##match back to the title?
+                                
+                                self.claim_id=matched_claim.id.values[0]
 
                             claim_text = claim_text.as_py() #convert StringScalar to python str
                             simil = self.crossEnc.predict([fr_to_check, claim_text])
@@ -83,18 +86,18 @@ class MiaFactChecker():
                             if  simil>0.3: #d[it][itr]>=0.5:
                                  #dfFactchecks.loc[dfFactchecks['id'] == c]
                                
-                                urls = [val.as_py() for val in related_factchecks.url.values]
+                                urls = list(set([val.as_py() for val in related_factchecks.url.values]))
                                 df_factcheck.append({
                                         "similarity": simil,
                                         "urls": urls,
                                         "type": claim_type,
                                         "tweet_text": fr_to_check,
-                                        "matched_claim_id": c, #todo: this is the lookup index, we need to fix this
+                                        "matched_claim_id": self.claim_id, #todo: this is the lookup index, we need to fix this
                                         "matched_claim_text": claim_text,
                                         "distance": d[it][itr],
                                         "embedding": self.embed.name,
                                         "metric": "cos",
-                                        "index": "claim_only"
+                                        "index": self.match_to
                                     })
                             itr += 1
                         it += 1

@@ -27,13 +27,14 @@ class GoogleFactCheckLoader(FactCheckLoader):
 
     #TODO: this should be dynamic, based on a db of queries, like the hashtags of the tweets.
     def loadFactChecks(self):
+        super().update_last_run()
         print(self.last_run)
+        print(self.dayssince)
         self.runQuery("covid")
         self.runQuery("vaccine")
         self.runQuery("corona")
         self.runQuery("COVID-19")
         self.runQuery('COVID-19-vaccin')
-        super().update_last_run()
         
 
     def runQuery(self, query): 
