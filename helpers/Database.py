@@ -91,8 +91,11 @@ class Database():
     def updateLastRun(self):
         with self.get_connection() as cursor:
             # Read a single record
-            sql = "UPDATE `management` SET lastrun=NOW() WHERE `loader_name`=%s"
-            cursor.execute(sql, (self.caller_name))
+            if(self.local):
+                sql = f"UPDATE `management` SET lastrun=julianday('now') WHERE `loader_name`='{self.caller_name}'"
+            else:
+                sql = f"UPDATE `management` SET lastrun=NOW() WHERE `loader_name`='{self.caller_name}'"
+            cursor.execute(sql)
                
     def retrieve_one(self,query):
         with self.get_connection() as cursor:
