@@ -12,3 +12,6 @@ testvenv
 *.pyc
 *.bin
 *.csv
+dockerfile outtake
+lambda_app.py
+twitterlistener.db-journal

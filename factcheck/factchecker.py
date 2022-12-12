@@ -50,10 +50,6 @@ class MiaFactChecker():
                 fr_to_check = fr_sentence[0]
                 tweetEmbedding = self.embed.embed([fr_to_check])
                 d,I = self.index.search_index(tweetEmbedding, k=50)
-
-               # dfSentences = pd.DataFrame(self.claims, columns=["id", "text"])
-               # dfFactchecks = pd.DataFrame(self.factchecks, columns=["id", "url"])
-
                 df_factcheck = []
 
                 it = 0
@@ -99,13 +95,18 @@ class MiaFactChecker():
                                         "metric": "cos",
                                         "index": self.match_to
                                     })
-                            itr += 1
+                            itr += 1   
                         it += 1
                 except Exception as e:
+                    print("Exception!")
                     print(e)
 
                 df_factcheck.sort(key=self.extract_simil, reverse=True)
-                unique = { each['matched_claim_id'] : each for each in df_factcheck }.values()
-                factchecks.append(unique)
+                unique =  list({ each['matched_claim_id'] : each for each in df_factcheck }.values())
+
+                if(len(unique)>0):
+                    factchecks.append(unique)
+                    
+        print(factchecks)
         return factchecks
 

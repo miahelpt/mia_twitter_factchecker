@@ -1,10 +1,14 @@
 node_modules
-twitterlistener.db
-models
-!models/download.sh
 
 datasets/*
 !datasets/download.sh
+
+models/*.bin 
+models/*.hdf5
+!models/combined-paraphrase-multilingual-mpnet-base-v2.bin
+!models/lookup_combined.hdf5
+!models/lookup_claims.hdf5
+!models/lid.176.bin
 
 app
 
